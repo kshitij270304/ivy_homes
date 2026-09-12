@@ -18,7 +18,7 @@ export default function RentalsPage() {
       
       const data = await res.json();
       setRentals(prev => {
-        const unique = data.results.filter((r: any) => !prev.some(p => p.rental_id === r.rental_id));
+        const unique = data.results.filter((r: any) => !prev.some(p => p.listing_id === r.listing_id));
         return [...prev, ...unique];
       });
       setHasMore(data.has_more);
@@ -40,7 +40,7 @@ export default function RentalsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {rentals.map(r => (
-          <div key={r.rental_id} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden flex flex-col p-5 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
+          <div key={r.listing_id} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden flex flex-col p-5 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
             <div className="flex-grow">
               <h3 className="font-semibold text-lg mb-1">{r.apartment_name || r.locality}</h3>
               <p className="text-gray-600 text-sm mb-4 capitalize">{r.locality}</p>
