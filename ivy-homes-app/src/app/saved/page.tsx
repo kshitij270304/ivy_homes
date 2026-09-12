@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
 import ListingCard from '@/components/ListingCard';
-import { useSavedListings } from '@/hooks/useSavedListings';
+import { useSavedListingsContext } from '@/contexts/SavedListingsContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function SavedPage() {
   const { user } = useAuth();
-  const { savedIds } = useSavedListings();
+  const { savedIds } = useSavedListingsContext();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
