@@ -45,7 +45,10 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
-  let res = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  const isLocal = endpoint.startsWith('/api/');
+  const url = isLocal ? endpoint : `${BASE_URL}${endpoint}`;
+
+  let res = await fetch(url, { ...options, headers });
   
   if (res.status === 401 && refreshToken) {
     // Try to refresh
@@ -53,7 +56,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
       await doRefresh();
       // Retry original request
       headers.set('Authorization', `Bearer ${accessToken}`);
-      res = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+      res = await fetch(url, { ...options, headers });
     } catch (e) {
       if (typeof window !== 'undefined') window.location.href = '/login';
       throw e;
