@@ -15,24 +15,8 @@ export default function ListingCard({ listing }: { listing: any }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden flex flex-col group relative h-full">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col group relative h-full p-5 hover:shadow-md transition-shadow">
       
-      {/* Top Image Placeholder */}
-      <Link href={`/listings/${listing.listing_id}`} className="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300 w-full rounded-2xl block overflow-hidden shrink-0">
-        <div className="absolute top-3 right-3 flex gap-2">
-          {listing.is_live && (
-            <span className="bg-[#002B99] text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">
-              Ivy Signature
-            </span>
-          )}
-          {!listing.is_live && (
-            <span className="bg-white text-orange-500 border border-orange-200 shadow-sm text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">
-              Coming Soon
-            </span>
-          )}
-        </div>
-      </Link>
-
       {/* Toast Notification */}
       {showToast && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded shadow-lg z-20 animate-fade-in-out pointer-events-none">
@@ -40,20 +24,20 @@ export default function ListingCard({ listing }: { listing: any }) {
         </div>
       )}
 
-      {/* Bottom Content */}
-      <div className="pt-4 flex-grow flex flex-col">
+      {/* Content */}
+      <div className="flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-1">
           <Link href={`/listings/${listing.listing_id}`}>
-            <h3 className="font-bold text-gray-900 text-[15px] hover:text-blue-700 transition-colors line-clamp-1">
+            <h3 className="font-bold text-gray-900 text-[16px] hover:text-blue-700 transition-colors line-clamp-1">
               {listing.apartment_name || 'Independent House'}
             </h3>
           </Link>
-          <p className="font-bold text-gray-900 text-[15px] whitespace-nowrap ml-2">
+          <p className="font-bold text-gray-900 text-[16px] whitespace-nowrap ml-3">
             ₹ {(listing.price / 10000000).toFixed(2)} Cr
           </p>
         </div>
         
-        <p className="text-gray-500 text-[13px] capitalize mb-4 line-clamp-1">
+        <p className="text-gray-500 text-[13px] capitalize mb-6 line-clamp-1">
           {listing.locality}
         </p>
         
