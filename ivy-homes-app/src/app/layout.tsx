@@ -32,7 +32,7 @@ export default function RootLayout({
           <SavedListingsProvider>
             <nav className="bg-white px-6 py-4 flex items-center justify-between sticky top-0 z-50 border-b border-gray-100">
               <Link href="/listings" className="flex items-center tracking-tight">
-                <span className="font-extrabold text-blue-800 text-2xl lowercase">ivy</span>
+                <span className="font-extrabold text-blue-800 text-2xl">Ivy</span>
                 <span className="text-gray-800 text-2xl lowercase ml-1">homes</span>
               </Link>
               
