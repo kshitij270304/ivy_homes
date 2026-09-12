@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+.price-range {
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.price-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 2px solid #172033;
+  border-radius: 9999px;
+  background: white;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.price-range::-moz-range-thumb {
+  width: 17px;
+  height: 17px;
+  border: 2px solid #172033;
+  border-radius: 9999px;
+  background: white;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
 :root {
   --background: #f9fafb;
   --foreground: #111827;

@@ -4,6 +4,18 @@ import { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
 import ListingCard from '@/components/ListingCard';
 
+const MIN_BUDGET = 0;
+const MAX_BUDGET = 100_000_000;
+const BUDGET_STEP = 100_000;
+
+function formatBudget(value: number) {
+  if (value >= 10_000_000) {
+    const crores = value / 10_000_000;
+    return `₹ ${Number.isInteger(crores) ? crores : crores.toFixed(1)} Cr`;
+  }
+  return `₹ ${value / 100_000} Lacs`;
+}
+
 export default function ListingsPage() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,8 +25,8 @@ export default function ListingsPage() {
   // Filters
   const [locality, setLocality] = useState('');
   const [bhk, setBhk] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(MIN_BUDGET.toString());
+  const [maxPrice, setMaxPrice] = useState(MAX_BUDGET.toString());
   const [furnishing, setFurnishing] = useState('');
 
   const loadListings = async (reset = false) => {
@@ -100,28 +112,39 @@ export default function ListingsPage() {
 
             <div>
               <label className="block text-sm text-gray-500 mb-2">Budget</label>
-              <div className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
-                <input 
-                  type="number" 
-                  placeholder="Min" 
-                  value={minPrice}
-                  onChange={e => setMinPrice(e.target.value)}
-                  className="w-1/2 border-b border-gray-200 pb-1 focus:outline-none focus:border-gray-400 bg-transparent text-left"
-                />
-                <input 
-                  type="number" 
-                  placeholder="Max" 
-                  value={maxPrice}
-                  onChange={e => setMaxPrice(e.target.value)}
-                  className="w-1/2 border-b border-gray-200 pb-1 focus:outline-none focus:border-gray-400 bg-transparent text-right"
-                />
+              <div className="mb-3 flex items-center justify-between text-sm font-medium text-gray-800">
+                <span>{formatBudget(Number(minPrice))}</span>
+                <span>{formatBudget(Number(maxPrice))}</span>
               </div>
-              {/* Fake dual slider for visual effect matching design */}
-              <div className="relative pt-4 pb-2">
-                <div className="absolute h-1 w-full bg-gray-200 rounded-full"></div>
-                <div className="absolute h-1 w-full bg-gray-900 rounded-full"></div>
-                <div className="absolute top-[14px] left-0 w-3 h-3 bg-white border-2 border-gray-900 rounded-full transform -translate-x-1/2"></div>
-                <div className="absolute top-[14px] right-0 w-3 h-3 bg-white border-2 border-gray-900 rounded-full transform translate-x-1/2"></div>
+              <div className="relative h-6">
+                <div className="absolute left-0 right-0 top-2.5 h-1 rounded-full bg-gray-200" />
+                <div
+                  className="absolute top-2.5 h-1 rounded-full bg-gray-900"
+                  style={{
+                    left: `${((Number(minPrice) - MIN_BUDGET) / (MAX_BUDGET - MIN_BUDGET)) * 100}%`,
+                    right: `${100 - ((Number(maxPrice) - MIN_BUDGET) / (MAX_BUDGET - MIN_BUDGET)) * 100}%`,
+                  }}
+                />
+                <input
+                  aria-label="Minimum price"
+                  className="price-range absolute inset-0 w-full"
+                  type="range"
+                  min={MIN_BUDGET}
+                  max={MAX_BUDGET}
+                  step={BUDGET_STEP}
+                  value={minPrice}
+                  onChange={(event) => setMinPrice(Math.min(Number(event.target.value), Number(maxPrice) - BUDGET_STEP).toString())}
+                />
+                <input
+                  aria-label="Maximum price"
+                  className="price-range absolute inset-0 w-full"
+                  type="range"
+                  min={MIN_BUDGET}
+                  max={MAX_BUDGET}
+                  step={BUDGET_STEP}
+                  value={maxPrice}
+                  onChange={(event) => setMaxPrice(Math.max(Number(event.target.value), Number(minPrice) + BUDGET_STEP).toString())}
+                />
               </div>
             </div>
 

@@ -1,9 +1,13 @@
 import Link from 'next/link';
 import { useSavedListingsContext } from '@/contexts/SavedListingsContext';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ListingCard({ listing }: { listing: any }) {
   const { isSaved, toggleSaved } = useSavedListingsContext();
+  const { user } = useAuth();
+  const router = useRouter();
   const saved = isSaved(listing.listing_id);
   const [showToast, setShowToast] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -11,6 +15,12 @@ export default function ListingCard({ listing }: { listing: any }) {
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (saving) return;
+    if (!user) {
+      if (window.confirm('Sign in to save this property. Go to the login page now?')) {
+        router.push('/login');
+      }
+      return;
+    }
 
     try {
       setSaving(true);

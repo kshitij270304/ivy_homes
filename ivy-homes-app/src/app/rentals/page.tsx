@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
-import Link from 'next/link';
 
 export default function RentalsPage() {
   const [rentals, setRentals] = useState<any[]>([]);
@@ -31,7 +30,7 @@ export default function RentalsPage() {
   };
 
   useEffect(() => {
-    loadRentals();
+    void loadRentals();
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
+import { browseAuthorization, ivyApiKey } from '@/lib/ivy-server';
 
-const API_KEY = process.env.IVY_API_KEY;
 const BASE_URL = 'https://solve.ivy.homes';
 
 // In-memory cache
@@ -8,7 +8,6 @@ let cachedListings: any[] = [];
 let lastFetchTime = 0;
 
 async function getAllListings(authHeader: string) {
-  if (!API_KEY) throw new Error('IVY_API_KEY is not configured.');
   // Cache for 5 minutes
   if (cachedListings.length > 0 && Date.now() - lastFetchTime < 5 * 60 * 1000) {
     return cachedListings;
@@ -21,7 +20,7 @@ async function getAllListings(authHeader: string) {
   while (hasMore) {
     const res = await fetch(`${BASE_URL}/v1/listings?limit=50&offset=${offset}`, {
       headers: {
-        'X-API-Key': API_KEY,
+        'X-API-Key': ivyApiKey(),
         'Authorization': authHeader
       }
     });
@@ -42,14 +41,9 @@ async function getAllListings(authHeader: string) {
 }
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
     const params = await context.params;
-    const allListings = await getAllListings(authHeader);
+    const allListings = await getAllListings(request.headers.get('Authorization') ?? await browseAuthorization());
     const listing = allListings.find(l => l.listing_id === params.id);
     
     if (!listing) {

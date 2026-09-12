@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { user, logout, isLoading } = useAuth();
 
   const links = [
     { name: 'Buy', href: '/listings' },
@@ -35,6 +37,24 @@ export default function Navbar() {
             );
           })}
         </div>
+        {!isLoading && (
+          user ? (
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:block text-sm text-gray-500">{user.name || user.email}</span>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-gray-400 hover:bg-gray-50"
+              >
+                Log out
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className="rounded-full bg-blue-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-900">
+              Sign in
+            </Link>
+          )
+        )}
       </div>
     </nav>
   );

@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server';
+import { browseAuthorization, ivyApiKey } from '@/lib/ivy-server';
 
 const BASE_URL = 'https://solve.ivy.homes';
-
-function apiKey() {
-  const key = process.env.IVY_API_KEY;
-  if (!key) throw new Error('IVY_API_KEY is not configured.');
-  return key;
-}
 
 function allowedPath(path: string) {
   return path === 'v1/listings'
     || path === 'v1/rentals'
     || path === 'v1/projects'
-    || path === 'v1/favourites'
-    || /^v1\/favourites\/[^/]+$/.test(path);
+    || path === 'v1/saved'
+    || /^v1\/saved\/[^/]+$/.test(path);
 }
 
 async function forward(request: Request, context: { params: Promise<{ path: string[] }> }) {
@@ -24,10 +19,13 @@ async function forward(request: Request, context: { params: Promise<{ path: stri
 
     const incomingUrl = new URL(request.url);
     const headers = new Headers();
-    headers.set('X-API-Key', apiKey());
+    headers.set('X-API-Key', ivyApiKey());
     headers.set('Accept', 'application/json');
     const authorization = request.headers.get('Authorization');
-    if (authorization) headers.set('Authorization', authorization);
+    if (endpoint.startsWith('v1/saved') && !authorization) {
+      return NextResponse.json({ detail: 'Sign in to manage saved properties.' }, { status: 401 });
+    }
+    headers.set('Authorization', authorization ?? await browseAuthorization());
     const contentType = request.headers.get('Content-Type');
     if (contentType) headers.set('Content-Type', contentType);
 

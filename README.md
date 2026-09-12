@@ -14,7 +14,7 @@ This repository contains the solution for the Ivy Homes engineering assignment.
 cd ivy-homes-app
 ```
 
-2. Create `ivy-homes-app/.env.local` from `ivy-homes-app/.env.example`, then fill in the API key and demo credentials supplied by Ivy Homes. The API key is read only by server routes and is not sent to the browser.
+2. Create `ivy-homes-app/.env.local` from `ivy-homes-app/.env.example`, then fill in the API key and one demo account's shared credentials supplied by Ivy Homes. The server uses that account only to provide read-only public browsing; each visitor's own login is still used for saved homes. None of these values are sent to the browser.
 
 3. Install dependencies:
 ```bash
@@ -34,7 +34,7 @@ I adopted a "trust but verify" approach. First, I pulled the entire dataset usin
 
 For the data quality issues, I wrote analysis scripts (`scripts/analyzeData.ts`) to validate the dataset's logical bounds. I grouped listings by coordinates to find impossible geographical locations (e.g. coordinates mapping to the Arctic instead of Mumbai). I grouped records by phone numbers to find contacts associated with multiple distinct broker names, revealing the "bait-and-switch" fraud rings. When my script caught `price_max` values like `12.44` for projects, I knew this had to be Crores rather than Rupees to logically make sense in the real estate domain.
 
-The frontend accounts for these behaviours: it uses offset pagination, only presents live listings in the buy flow, renders project prices as crores and project areas as square feet, and computes the Insights screen from the retrievable listing data because the documented analytics endpoint does not exist. Authentication is routed through the Next.js server. Refresh tokens renew an expired access token and saved listings use the API's per-user favourites endpoints, so they survive reloads and a later re-login.
+The frontend accounts for these behaviours: it uses offset pagination, only presents live listings in the buy flow, renders project prices as crores and project areas as square feet, and computes the Insights screen from the retrievable listing data because the documented analytics endpoint does not exist. Authentication is routed through the Next.js server. Refresh tokens renew an expired access token and saved listings use the API's per-user saved-listing endpoints, so they survive reloads and a later re-login.
 
 For the missing endpoints (like `/v1/analytics/summary`), I built robust fallback mechanisms in my Next.js API routes that performed these aggregations on-the-fly using the cached raw dataset.
 

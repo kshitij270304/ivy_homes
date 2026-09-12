@@ -26,7 +26,7 @@ export function SavedListingsProvider({ children }: { children: React.ReactNode 
 
     setIsLoading(true);
     try {
-      const res = await fetchApi('/v1/favourites');
+      const res = await fetchApi('/v1/saved');
       if (!res.ok) throw new Error('Unable to load saved properties.');
       const data = await res.json();
       setSavedIds((data.results ?? []).map((listing: { listing_id: string }) => listing.listing_id));
@@ -47,13 +47,13 @@ export function SavedListingsProvider({ children }: { children: React.ReactNode 
 
     const alreadySaved = savedIds.includes(id);
     const res = await fetchApi(
-      alreadySaved ? `/v1/favourites/${encodeURIComponent(id)}` : '/v1/favourites',
+      alreadySaved ? `/v1/saved/${encodeURIComponent(id)}` : '/v1/saved',
       alreadySaved
         ? { method: 'DELETE' }
         : {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id }),
+            body: JSON.stringify({ listing_id: id }),
           },
     );
 
