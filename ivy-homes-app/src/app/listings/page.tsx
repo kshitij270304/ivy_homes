@@ -42,7 +42,11 @@ export default function ListingsPage() {
       if (maxPrice) results = results.filter((r: any) => r.price <= parseInt(maxPrice));
       if (furnishing) results = results.filter((r: any) => r.furnishing === furnishing);
 
-      setListings(prev => reset ? results : [...prev, ...results]);
+      setListings(prev => {
+        if (reset) return results;
+        const unique = results.filter((r: any) => !prev.some(p => p.listing_id === r.listing_id));
+        return [...prev, ...unique];
+      });
       setHasMore(data.has_more);
       setOffset(currentOffset + 50);
     } catch (e) {

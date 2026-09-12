@@ -17,7 +17,10 @@ export default function RentalsPage() {
       if (!res.ok) throw new Error('Failed to load rentals');
       
       const data = await res.json();
-      setRentals(prev => [...prev, ...data.results]);
+      setRentals(prev => {
+        const unique = data.results.filter((r: any) => !prev.some(p => p.rental_id === r.rental_id));
+        return [...prev, ...unique];
+      });
       setHasMore(data.has_more);
       setOffset(offset + 50);
     } catch (e) {

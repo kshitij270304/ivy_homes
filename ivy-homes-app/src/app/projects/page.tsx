@@ -16,7 +16,10 @@ export default function ProjectsPage() {
       if (!res.ok) throw new Error('Failed to load projects');
       
       const data = await res.json();
-      setProjects(prev => [...prev, ...data.results]);
+      setProjects(prev => {
+        const unique = data.results.filter((r: any) => !prev.some(p => p.project_id === r.project_id));
+        return [...prev, ...unique];
+      });
       setHasMore(data.has_more);
       setOffset(offset + 50);
     } catch (e) {
