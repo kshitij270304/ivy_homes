@@ -42,12 +42,12 @@ export default function ProjectsPage() {
           <div key={p.project_id} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden flex flex-col p-5 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
             <div className="flex-grow">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg">{p.project_name}</h3>
-                <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${p.project_status === 'Ready to Move' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                <h3 className="font-semibold text-lg">{p.apartment_name}</h3>
+                <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${p.project_status === 'ready to move' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                   {p.project_status}
                 </span>
               </div>
-              <p className="text-gray-600 text-sm mb-4">By {p.builder_name}</p>
+              <p className="text-gray-600 text-sm mb-4">By {p.developer_name}</p>
               
               <div className="grid grid-cols-2 gap-y-2 text-sm mb-4">
                 <div>
@@ -59,7 +59,7 @@ export default function ProjectsPage() {
                 <div>
                   <span className="text-gray-500">Area Range:</span>
                   <p className="font-semibold text-gray-900">
-                    {p.area_min} - {p.area_max} sqft
+                    {p.min_area_sqft} - {p.max_area_sqft} sqft
                   </p>
                 </div>
                 <div>

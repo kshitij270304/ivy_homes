@@ -1,14 +1,14 @@
-const API_KEY = 'IVY26-DB796E086273';
-const BASE_URL = 'https://solve.ivy.homes';
-
 let accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 let refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+let refreshInFlight: Promise<void> | null = null;
 
-export const setTokens = (access: string, refresh: string) => {
+export const setTokens = (access: string, refresh?: string | null) => {
   accessToken = access;
-  refreshToken = refresh;
   localStorage.setItem('access_token', access);
-  localStorage.setItem('refresh_token', refresh);
+  if (refresh) {
+    refreshToken = refresh;
+    localStorage.setItem('refresh_token', refresh);
+  }
 };
 
 export const clearTokens = () => {
@@ -20,46 +20,53 @@ export const clearTokens = () => {
 
 export const isAuthenticated = () => !!accessToken;
 
+function apiUrl(endpoint: string) {
+  if (endpoint.startsWith('/api/')) return endpoint;
+  return `/api/ivy${endpoint}`;
+}
+
 async function doRefresh() {
-  if (!refreshToken) throw new Error('No refresh token available');
-  const res = await fetch(`${BASE_URL}/auth/refresh`, {
+  if (!refreshToken) throw new Error('Your session has expired. Please sign in again.');
+  const res = await fetch('/api/auth/refresh', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': API_KEY,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
   if (!res.ok) {
     clearTokens();
-    throw new Error('Refresh failed');
+    throw new Error('Your session has expired. Please sign in again.');
   }
   const data = await res.json();
+  if (!data.access_token) {
+    clearTokens();
+    throw new Error('The refresh response did not include an access token.');
+  }
   setTokens(data.access_token, data.refresh_token);
+}
+
+async function refreshSession() {
+  if (!refreshInFlight) {
+    refreshInFlight = doRefresh().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+  return refreshInFlight;
 }
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers);
-  headers.set('X-API-Key', API_KEY);
-  if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
-  }
-
-  const isLocal = endpoint.startsWith('/api/');
-  const url = isLocal ? endpoint : `${BASE_URL}${endpoint}`;
-
-  let res = await fetch(url, { ...options, headers });
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+  const request = () => fetch(apiUrl(endpoint), { ...options, headers });
+  let res = await request();
   
-  if (res.status === 401 && refreshToken) {
-    // Try to refresh
+  if (res.status === 401 && refreshToken && endpoint !== '/auth/login') {
     try {
-      await doRefresh();
-      // Retry original request
+      await refreshSession();
       headers.set('Authorization', `Bearer ${accessToken}`);
-      res = await fetch(url, { ...options, headers });
-    } catch (e) {
-      if (typeof window !== 'undefined') window.location.href = '/login';
-      throw e;
+      res = await request();
+    } catch (error) {
+      if (typeof window !== 'undefined') window.location.assign('/login');
+      throw error;
     }
   }
 

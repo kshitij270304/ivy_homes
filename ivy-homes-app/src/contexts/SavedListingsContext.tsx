@@ -1,47 +1,76 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { fetchApi } from '@/lib/api';
 import { useAuth } from './AuthContext';
 
 interface SavedListingsContextType {
   savedIds: string[];
-  toggleSaved: (id: string) => void;
+  isLoading: boolean;
+  toggleSaved: (id: string) => Promise<void>;
   isSaved: (id: string) => boolean;
 }
 
-const SavedListingsContext = createContext<SavedListingsContextType>({} as any);
+const SavedListingsContext = createContext<SavedListingsContextType>({} as SavedListingsContextType);
 
 export function SavedListingsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadSaved = useCallback(async () => {
+    if (!user?.email) {
+      setSavedIds([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetchApi('/v1/favourites');
+      if (!res.ok) throw new Error('Unable to load saved properties.');
+      const data = await res.json();
+      setSavedIds((data.results ?? []).map((listing: { listing_id: string }) => listing.listing_id));
+    } catch (error) {
+      console.error(error);
+      setSavedIds([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.email]);
 
   useEffect(() => {
-    if (user?.email) {
-      const stored = localStorage.getItem(`saved_${user.email}`);
-      if (stored) {
-        setSavedIds(JSON.parse(stored));
-      } else {
-        setSavedIds([]);
-      }
-    } else {
-      setSavedIds([]);
-    }
-  }, [user]);
+    void loadSaved();
+  }, [loadSaved]);
 
-  const toggleSaved = (id: string) => {
-    if (!user?.email) return;
-    
-    setSavedIds(prev => {
-      const newIds = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      localStorage.setItem(`saved_${user.email}`, JSON.stringify(newIds));
-      return newIds;
-    });
+  const toggleSaved = async (id: string) => {
+    if (!user?.email) throw new Error('Please sign in to save a property.');
+
+    const alreadySaved = savedIds.includes(id);
+    const res = await fetchApi(
+      alreadySaved ? `/v1/favourites/${encodeURIComponent(id)}` : '/v1/favourites',
+      alreadySaved
+        ? { method: 'DELETE' }
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+          },
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail || 'Unable to update saved properties.');
+    }
+
+    setSavedIds((previous) =>
+      alreadySaved ? previous.filter((savedId) => savedId !== id) : [...previous, id],
+    );
   };
 
   const isSaved = (id: string) => savedIds.includes(id);
 
   return (
-    <SavedListingsContext.Provider value={{ savedIds, toggleSaved, isSaved }}>
+    <SavedListingsContext.Provider value={{ savedIds, isLoading, toggleSaved, isSaved }}>
       {children}
     </SavedListingsContext.Provider>
   );

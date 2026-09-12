@@ -476,15 +476,6 @@
     },
     {
       "endpoint": "/v1/listings",
-      "category": "filters",
-      "documented": "GET /v1/listings?project_id=... filters by project",
-      "actual": "project_id filter is completely ignored and returns all 5100 listings",
-      "how_found": "Called /v1/listings?project_id=P50016 and received total 4732 and results containing other projects",
-      "impact": "Project specific listings cannot be fetched server-side, requiring client-side filtering",
-      "evidence": []
-    },
-    {
-      "endpoint": "/v1/listings",
       "category": "duplicates",
       "documented": "each listing corresponds to exactly one physical property",
       "actual": "Multiple listings describe the same physical property across different websites",

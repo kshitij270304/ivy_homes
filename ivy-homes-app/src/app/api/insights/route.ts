@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 
-const API_KEY = 'IVY26-DB796E086273';
+const API_KEY = process.env.IVY_API_KEY;
 const BASE_URL = 'https://solve.ivy.homes';
 
 let cachedListings: any[] = [];
 let lastFetchTime = 0;
 
 async function getAllListings(authHeader: string) {
+  if (!API_KEY) throw new Error('IVY_API_KEY is not configured.');
   if (cachedListings.length > 0 && Date.now() - lastFetchTime < 5 * 60 * 1000) {
     return cachedListings;
   }

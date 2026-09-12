@@ -29,12 +29,12 @@ export default function ListingsPage() {
       if (maxPrice) params.append('max_price', maxPrice);
       if (furnishing) params.append('furnishing', furnishing);
 
-      const res = await fetchApi(`/v1/listings?${params.toString()}`);
+      const res = await fetchApi(`/api/listings/search?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to load listings');
       
       const data = await res.json();
       
-      let results = data.results;
+      let results = (data.results ?? []).filter((r: any) => r.is_live === true);
       if (locality) results = results.filter((r: any) => r.locality.toLowerCase() === locality.toLowerCase());
       if (bhk) results = results.filter((r: any) => r.bedroom.toString() === bhk);
       if (minPrice) results = results.filter((r: any) => r.price >= parseInt(minPrice));

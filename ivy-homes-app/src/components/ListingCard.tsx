@@ -6,12 +6,22 @@ export default function ListingCard({ listing }: { listing: any }) {
   const { isSaved, toggleSaved } = useSavedListingsContext();
   const saved = isSaved(listing.listing_id);
   const [showToast, setShowToast] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
-    toggleSaved(listing.listing_id);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+    if (saving) return;
+
+    try {
+      setSaving(true);
+      await toggleSaved(listing.listing_id);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Unable to update saved properties.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -64,6 +74,8 @@ export default function ListingCard({ listing }: { listing: any }) {
           
           <button 
             onClick={handleToggle}
+            disabled={saving}
+            aria-label={saved ? 'Remove from saved properties' : 'Save property'}
             className="text-gray-400 hover:text-red-500 transition-colors p-1"
           >
             {saved ? (

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const BASE_URL = 'https://solve.ivy.homes';
-const API_KEY = 'IVY26-DB796E086273';
+const API_KEY = process.env.IVY_API_KEY;
 const DATA_DIR = path.join(__dirname, '..', '..', 'scratch');
 
 if (!fs.existsSync(DATA_DIR)) {
@@ -12,6 +12,9 @@ if (!fs.existsSync(DATA_DIR)) {
 let authToken = '';
 
 async function login() {
+  if (!API_KEY || !process.env.IVY_DEMO_EMAIL || !process.env.IVY_DEMO_PASSWORD) {
+    throw new Error('Set IVY_API_KEY, IVY_DEMO_EMAIL and IVY_DEMO_PASSWORD before running this script.');
+  }
   console.log('Logging in...');
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
@@ -19,7 +22,7 @@ async function login() {
       'Content-Type': 'application/json',
       'X-API-Key': API_KEY 
     },
-    body: JSON.stringify({ email: 'demo1@ivy.homes', password: '3fa9fa6690' })
+    body: JSON.stringify({ email: process.env.IVY_DEMO_EMAIL, password: process.env.IVY_DEMO_PASSWORD })
   });
   if (!res.ok) {
       const text = await res.text();
@@ -34,7 +37,7 @@ async function fetchWithRetry(url: string, retries = 3, includeKey = true): Prom
   for (let i = 0; i < retries; i++) {
     try {
       const headers: Record<string, string> = {};
-      if (includeKey) headers['X-API-Key'] = API_KEY;
+      if (includeKey && API_KEY) headers['X-API-Key'] = API_KEY;
       if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
       
       const res = await fetch(url, { headers });

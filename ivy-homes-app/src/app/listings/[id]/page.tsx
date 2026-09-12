@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { fetchApi } from '@/lib/api';
 
 export default function ListingDetail() {
   const params = useParams();
@@ -13,18 +14,13 @@ export default function ListingDetail() {
 
   useEffect(() => {
     async function load() {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
+      if (!localStorage.getItem('access_token')) {
         window.location.href = '/login';
         return;
       }
       
       try {
-        const res = await fetch(`/api/listing/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const res = await fetchApi(`/api/listing/${id}`);
         
         if (!res.ok) {
           throw new Error(res.status === 404 ? 'Listing not found' : 'Failed to load');

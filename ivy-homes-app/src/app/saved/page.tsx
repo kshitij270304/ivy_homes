@@ -8,13 +8,14 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function SavedPage() {
   const { user } = useAuth();
-  const { savedIds } = useSavedListingsContext();
+  const { savedIds, isLoading: isLoadingSaved } = useSavedListingsContext();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (!user) return;
+      if (isLoadingSaved) return;
       if (savedIds.length === 0) {
         setListings([]);
         setLoading(false);
@@ -36,7 +37,7 @@ export default function SavedPage() {
     }
     
     load();
-  }, [user, savedIds]);
+  }, [user, savedIds, isLoadingSaved]);
 
   if (!user) return null;
 
