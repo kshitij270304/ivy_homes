@@ -34,7 +34,6 @@ export default function ListingsPage() {
       
       const data = await res.json();
       
-      // Server-side filtering validation (just in case the server lied)
       let results = data.results;
       if (locality) results = results.filter((r: any) => r.locality.toLowerCase() === locality.toLowerCase());
       if (bhk) results = results.filter((r: any) => r.bedroom.toString() === bhk);
@@ -44,7 +43,7 @@ export default function ListingsPage() {
 
       setListings(prev => {
         if (reset) return results;
-        const unique = results.filter((r: any) => !prev.some(p => p.listing_id === r.listing_id));
+        const unique = results.filter((r: any) => !prev.some((p:any) => p.listing_id === r.listing_id));
         return [...prev, ...unique];
       });
       setHasMore(data.has_more);
@@ -61,81 +60,125 @@ export default function ListingsPage() {
   }, [locality, bhk, minPrice, maxPrice, furnishing]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Properties for Sale</h1>
-      
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Locality</label>
-          <input 
-            type="text" 
-            placeholder="e.g. Andheri West" 
-            value={locality}
-            onChange={e => setLocality(e.target.value)}
-            className="w-full border border-gray-300 rounded p-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">BHK</label>
-          <select value={bhk} onChange={e => setBhk(e.target.value)} className="w-full border border-gray-300 rounded p-2 text-sm bg-white">
-            <option value="">Any</option>
-            <option value="1">1 BHK</option>
-            <option value="2">2 BHK</option>
-            <option value="3">3 BHK</option>
-            <option value="4">4+ BHK</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Min Price</label>
-          <input 
-            type="number" 
-            placeholder="₹" 
-            value={minPrice}
-            onChange={e => setMinPrice(e.target.value)}
-            className="w-full border border-gray-300 rounded p-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Max Price</label>
-          <input 
-            type="number" 
-            placeholder="₹" 
-            value={maxPrice}
-            onChange={e => setMaxPrice(e.target.value)}
-            className="w-full border border-gray-300 rounded p-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Furnishing</label>
-          <select value={furnishing} onChange={e => setFurnishing(e.target.value)} className="w-full border border-gray-300 rounded p-2 text-sm bg-white">
-            <option value="">Any</option>
-            <option value="unfurnished">Unfurnished</option>
-            <option value="semi-furnished">Semi-furnished</option>
-            <option value="fully-furnished">Fully-furnished</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {listings.map((l, i) => <ListingCard key={l.listing_id + i} listing={l} />)}
-      </div>
-
-      {loading && <p className="text-center py-8 text-gray-500">Loading...</p>}
-      
-      {!loading && hasMore && (
-        <div className="mt-8 text-center">
-          <button 
-            onClick={() => loadListings(false)}
-            className="bg-blue-100 text-blue-700 px-6 py-2 rounded-lg font-medium hover:bg-blue-200"
-          >
-            Load More
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Left Sidebar Filters */}
+      <aside className="w-full lg:w-72 shrink-0">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
+          
+          <button className="flex items-center justify-center gap-2 w-max bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium mb-6 hover:bg-gray-800 transition">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            Map view
           </button>
-        </div>
-      )}
 
-      {!loading && listings.length === 0 && (
-        <p className="text-center py-8 text-gray-500">No properties found matching your filters.</p>
-      )}
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm text-gray-500 mb-2">Apartment / Location</label>
+              <div className="relative">
+                <svg className="absolute left-3 top-3 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input 
+                  type="text" 
+                  placeholder="Search upto 3 localities" 
+                  value={locality}
+                  onChange={e => setLocality(e.target.value)}
+                  className="w-full border border-gray-200 rounded-full pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-gray-400"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-500 mb-2">Select BHK</label>
+              <div className="flex flex-wrap gap-2">
+                {['1', '2', '3', '4'].map(val => (
+                  <button
+                    key={val}
+                    onClick={() => setBhk(bhk === val ? '' : val)}
+                    className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${
+                      bhk === val 
+                        ? 'border-blue-800 text-blue-800 bg-blue-50' 
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {val} BHK
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-500 mb-2">Budget</label>
+              <div className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <input 
+                  type="number" 
+                  placeholder="Min" 
+                  value={minPrice}
+                  onChange={e => setMinPrice(e.target.value)}
+                  className="w-1/2 border-b border-gray-200 pb-1 focus:outline-none focus:border-gray-400 bg-transparent text-left"
+                />
+                <input 
+                  type="number" 
+                  placeholder="Max" 
+                  value={maxPrice}
+                  onChange={e => setMaxPrice(e.target.value)}
+                  className="w-1/2 border-b border-gray-200 pb-1 focus:outline-none focus:border-gray-400 bg-transparent text-right"
+                />
+              </div>
+              {/* Fake dual slider for visual effect matching design */}
+              <div className="relative pt-4 pb-2">
+                <div className="absolute h-1 w-full bg-gray-200 rounded-full"></div>
+                <div className="absolute h-1 w-full bg-gray-900 rounded-full"></div>
+                <div className="absolute top-[14px] left-0 w-3 h-3 bg-white border-2 border-gray-900 rounded-full transform -translate-x-1/2"></div>
+                <div className="absolute top-[14px] right-0 w-3 h-3 bg-white border-2 border-gray-900 rounded-full transform translate-x-1/2"></div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-500 mb-2">Property Type</label>
+              <div className="flex flex-wrap gap-2">
+                {['unfurnished', 'semi-furnished', 'fully-furnished'].map(val => (
+                  <button
+                    key={val}
+                    onClick={() => setFurnishing(furnishing === val ? '' : val)}
+                    className={`px-4 py-1.5 rounded-full text-sm border capitalize transition-colors ${
+                      furnishing === val 
+                        ? 'border-blue-800 text-blue-800 bg-blue-50' 
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {val.replace('-', ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Content */}
+      <div className="flex-1">
+        <h1 className="text-[26px] font-semibold text-gray-900 mb-6 tracking-tight">Homes in Mumbai</h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {listings.map((l, i) => <ListingCard key={l.listing_id + i} listing={l} />)}
+        </div>
+
+        {loading && <p className="text-center py-8 text-gray-500">Loading...</p>}
+        
+        {!loading && hasMore && (
+          <div className="mt-8 text-center">
+            <button 
+              onClick={() => loadListings(false)}
+              className="bg-blue-100 text-blue-700 px-6 py-2 rounded-full font-medium hover:bg-blue-200"
+            >
+              Load More
+            </button>
+          </div>
+        )}
+
+        {!loading && listings.length === 0 && (
+          <p className="text-center py-8 text-gray-500">No properties found matching your filters.</p>
+        )}
+      </div>
     </div>
   );
 }
