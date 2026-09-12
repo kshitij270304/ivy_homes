@@ -15,7 +15,7 @@ export default function ListingCard({ listing }: { listing: any }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col group relative h-full p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden flex flex-col group relative h-full p-5 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
       
       {/* Toast Notification */}
       {showToast && (

@@ -39,8 +39,8 @@ export default function ProjectsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {projects.map(p => (
-          <div key={p.project_id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col">
-            <div className="p-4 flex-grow">
+          <div key={p.project_id} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden flex flex-col p-5 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
+            <div className="flex-grow">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="font-semibold text-lg">{p.project_name}</h3>
                 <span className={`text-xs font-medium px-2.5 py-0.5 rounded ${p.project_status === 'Ready to Move' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
