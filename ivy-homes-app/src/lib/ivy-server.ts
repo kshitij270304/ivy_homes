@@ -35,3 +35,51 @@ export async function browseAuthorization() {
   browseTokenExpiresAt = Date.now() + Math.max((Number(data.expires_in) || 900) - 30, 30) * 1000;
   return `Bearer ${browseAccessToken}`;
 }
+
+
+let cachedListings: any[] = [];
+let lastFetchTime = 0;
+
+export async function getAllListings(authHeader: string) {
+  if (cachedListings.length > 0 && Date.now() - lastFetchTime < 5 * 60 * 1000) {
+    return cachedListings;
+  }
+  
+  const apiKey = ivyApiKey();
+  const allListings = [];
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const batchOffsets = Array.from({ length: 20 }, (_, i) => offset + i * 50);
+    const responses = await Promise.all(
+      batchOffsets.map(off => 
+        fetch(${BASE_URL}/v1/listings?limit=50&offset=, {
+          headers: { 'X-API-Key': apiKey, 'Authorization': authHeader },
+          cache: 'no-store'
+        }).then(r => r.ok ? r.json() : null).catch(() => null)
+      )
+    );
+    
+    let batchHadData = false;
+    for (const data of responses) {
+      if (data && data.results && data.results.length > 0) {
+        allListings.push(...data.results);
+        batchHadData = true;
+        if (!data.has_more) hasMore = false;
+      } else {
+        hasMore = false;
+      }
+    }
+    
+    if (!batchHadData) break;
+    offset += 20 * 50;
+  }
+  
+  const unique = Array.from(new Map(allListings.map((l: any) => [l.listing_id, l])).values());
+  if (unique.length > 0) {
+    cachedListings = unique;
+    lastFetchTime = Date.now();
+  }
+  return cachedListings;
+}

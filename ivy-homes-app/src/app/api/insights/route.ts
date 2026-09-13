@@ -1,40 +1,7 @@
 import { NextResponse } from 'next/server';
-import { browseAuthorization, ivyApiKey } from '@/lib/ivy-server';
+import { browseAuthorization, ivyApiKey, getAllListings } from '@/lib/ivy-server';
 
 const BASE_URL = 'https://solve.ivy.homes';
-
-let cachedListings: any[] = [];
-let lastFetchTime = 0;
-
-async function getAllListings(authHeader: string) {
-  const apiKey = ivyApiKey();
-  if (cachedListings.length > 0 && Date.now() - lastFetchTime < 5 * 60 * 1000) {
-    return cachedListings;
-  }
-  
-  cachedListings = [];
-  let offset = 0;
-  let hasMore = true;
-  
-  while (hasMore) {
-    const res = await fetch(`${BASE_URL}/v1/listings?limit=50&offset=${offset}`, {
-      headers: { 'X-API-Key': apiKey, 'Authorization': authHeader }
-    });
-    
-    if (!res.ok) {
-      if (cachedListings.length > 0) return cachedListings;
-      throw new Error('Failed to fetch listings');
-    }
-    
-    const data = await res.json();
-    cachedListings.push(...data.results);
-    hasMore = data.has_more;
-    offset += 50;
-  }
-  
-  lastFetchTime = Date.now();
-  return cachedListings;
-}
 
 export async function GET(request: Request) {
   const authorization = request.headers.get('Authorization') ?? await browseAuthorization();
