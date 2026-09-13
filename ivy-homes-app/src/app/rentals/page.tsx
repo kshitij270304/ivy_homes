@@ -47,11 +47,11 @@ export default function RentalsPage() {
               <div className="grid grid-cols-2 gap-y-2 text-sm">
                 <div>
                   <span className="text-gray-500">Rent:</span>
-                  <p className="font-semibold text-gray-900">₹{(r.price / 100000).toFixed(2)} L/mo</p>
+                  <p className="font-semibold text-gray-900">₹{r.price.toLocaleString('en-IN')}/mo</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Deposit:</span>
-                  <p className="font-semibold text-gray-900">₹{(r.deposit / 100000).toFixed(2)} L</p>
+                  <p className="font-semibold text-gray-900">₹{r.deposit.toLocaleString('en-IN')}</p>
                 </div>
                 <div>
                   <span className="text-gray-500">Config:</span>

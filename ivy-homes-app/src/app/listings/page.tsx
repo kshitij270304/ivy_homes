@@ -47,7 +47,7 @@ export default function ListingsPage() {
       const data = await res.json();
       
       let results = (data.results ?? []).filter((r: any) => r.is_live === true);
-      if (locality) results = results.filter((r: any) => r.locality.toLowerCase() === locality.toLowerCase());
+      if (locality) results = results.filter((r: any) => r.locality.toLowerCase().includes(locality.toLowerCase()));
       if (bhk) results = results.filter((r: any) => r.bedroom.toString() === bhk);
       if (minPrice) results = results.filter((r: any) => r.price >= parseInt(minPrice));
       if (maxPrice) results = results.filter((r: any) => r.price <= parseInt(maxPrice));

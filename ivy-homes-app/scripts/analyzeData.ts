@@ -101,10 +101,9 @@ let last7DaysCount = 0;
 const refTime = new Date('2026-09-10T00:00:00+05:30').getTime();
 const sevenDaysBefore = refTime - 7 * 24 * 60 * 60 * 1000;
 for (const l of listings) {
-  // Let's assume the string is in UTC because API reference says:
-  // "Timestamps: ISO 8601, UTC, Z suffix, everywhere in the API"
-  // But they lack the Z. Let's parse them as UTC.
-  const postedAt = new Date(l.posted_at + 'Z').getTime();
+  // Finding #6 proved posted_at is already in IST (no Z suffix, local time).
+  // Parse as IST by appending the correct offset.
+  const postedAt = new Date(l.posted_at + '+05:30').getTime();
   if (postedAt >= sevenDaysBefore && postedAt < refTime) {
     last7DaysCount++;
   }

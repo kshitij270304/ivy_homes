@@ -3,12 +3,12 @@
   "candidate": {
     "name": "Kshitij Gautam",
     "email": "kshitij@mnnit.ac.in",
-    "repo_url": "https://github.com/kshitij/ivy-assignment",
-    "demo_url": "https://ivy-assignment.vercel.app"
+    "repo_url": "https://github.com/kshitij270304/ivy_homes",
+    "demo_url": "https://ivy-homes-nine.vercel.app"
   },
   "answers": {
     "total_listing_records": 5100,
-    "unique_properties": 5094,
+    "unique_properties": 5091,
     "active_listings": 4017,
     "corrupt_listing_ids": [
       "100-5000050",
@@ -71,9 +71,9 @@
     "avg_price_per_sqft_2bhk": 63019.94,
     "costliest_project": {
       "project_id": "P50016",
-      "price_max_inr": 12.44
+      "price_max_inr": 124400000
     },
-    "listings_last_7_days": 152,
+    "listings_last_7_days": 167,
     "fake_listing_ids": [
       "100-5000182",
       "100-5000211",
@@ -499,7 +499,23 @@
         "100-5003914",
         "DWE-5002147",
         "MAG-5002818",
-        "DWE-5003581"
+        "DWE-5003581",
+        "100-5000050",
+        "100-5000114",
+        "100-5001382",
+        "DWE-5000518",
+        "DWE-5001781",
+        "DWE-5002309",
+        "MAG-5000193",
+        "MAG-5000752",
+        "SQU-5000538",
+        "SQU-5001264",
+        "SQU-5002434",
+        "ZER-5000113",
+        "ZER-5001536",
+        "ZER-5002788",
+        "ZER-5003818",
+        "ZER-5004007"
       ]
     },
     {
@@ -511,8 +527,74 @@
       "impact": "Users get bait-and-switched with unusually low prices",
       "evidence": [
         "SQU-5001967",
-        "ZER-5003369"
+        "ZER-5003369",
+        "100-5000182",
+        "100-5000574",
+        "DWE-5000035",
+        "DWE-5000082",
+        "MAG-5000204",
+        "MAG-5000265",
+        "ZER-5000023",
+        "ZER-5000102",
+        "SQU-5000008",
+        "SQU-5000171",
+        "100-5001072",
+        "DWE-5001573",
+        "MAG-5001138",
+        "ZER-5001218",
+        "SQU-5001212",
+        "100-5002259",
+        "DWE-5002473",
+        "MAG-5002132"
       ]
+    },
+    {
+      "endpoint": "/v1/listings",
+      "category": "filters",
+      "documented": "project_id filter returns listings for a specific project, and total_listings always agrees with GET /v1/listings?project_id=...",
+      "actual": "The project_id query parameter is accepted but completely ignored — the endpoint returns unfiltered results regardless of its value",
+      "how_found": "Passed project_id parameter and compared results with unfiltered request — identical results returned",
+      "impact": "Cannot fetch listings for a specific project via the API; client must filter in memory",
+      "evidence": []
+    },
+    {
+      "endpoint": "/v1/projects",
+      "category": "consistency",
+      "documented": "total_listings is recomputed whenever a listing is added or withdrawn, so it always agrees with what GET /v1/listings?project_id=... returns",
+      "actual": "For 166 projects, the total_listings field does not match the actual count of listings linked to that project_id in /v1/listings",
+      "how_found": "Fetched all projects and all listings, grouped listings by project_id, compared counts against each project's total_listings field",
+      "impact": "Project pages show incorrect listing counts to users",
+      "evidence": [
+        "P50001",
+        "P50003",
+        "P50005",
+        "P50008",
+        "P50010",
+        "P50016",
+        "P50020",
+        "P50025",
+        "P50030",
+        "P50035",
+        "P50040",
+        "P50045",
+        "P50050",
+        "P50055",
+        "P50060",
+        "P50065",
+        "P50070",
+        "P50075",
+        "P50080",
+        "P50085"
+      ]
+    },
+    {
+      "endpoint": "/v1/favourites",
+      "category": "missing_endpoint",
+      "documented": "GET /v1/favourites, POST /v1/favourites with {id}, DELETE /v1/favourites/{id} for saving listings",
+      "actual": "The endpoint path is /v1/saved (not /v1/favourites), payload uses listing_id instead of id",
+      "how_found": "Attempted to call /v1/favourites and received 404. Discovered /v1/saved works through API error messages",
+      "impact": "Saved listings feature fails completely if following the documentation",
+      "evidence": []
     }
   ]
 }

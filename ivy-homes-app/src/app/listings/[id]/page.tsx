@@ -14,11 +14,6 @@ export default function ListingDetail() {
 
   useEffect(() => {
     async function load() {
-      if (!localStorage.getItem('access_token')) {
-        window.location.href = '/login';
-        return;
-      }
-      
       try {
         const res = await fetchApi(`/api/listing/${id}`);
         
@@ -50,7 +45,7 @@ export default function ListingDetail() {
             <p className="text-gray-600 text-lg capitalize">{listing.locality}</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-blue-600">₹{(listing.price / 100000).toFixed(2)} L</p>
+            <p className="text-3xl font-bold text-blue-600">₹ {(listing.price / 10000000).toFixed(2)} Cr</p>
             <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium mt-2 ${listing.is_live ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {listing.is_live ? 'Active' : 'Inactive'}
             </span>

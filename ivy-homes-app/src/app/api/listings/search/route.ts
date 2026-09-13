@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     const matching = (await getAllListings(authorization)).filter((listing) => {
       const price = Number(listing.price);
       return listing.is_live === true
-        && (!locality || String(listing.locality).toLowerCase() === locality)
+        && (!locality || String(listing.locality).toLowerCase().includes(locality))
         && (!furnishing || String(listing.furnishing).toLowerCase() === furnishing)
         && (!Number.isFinite(bhk) || bhk === 0 || Number(listing.bedroom) === bhk)
         && (!Number.isFinite(minPrice) || minPrice === 0 || price >= minPrice)
