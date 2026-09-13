@@ -2,7 +2,7 @@
 
 This repository contains the solution for the Ivy Homes engineering assignment.
 
-> **AI Disclosure:** As permitted by the rules, I used an AI coding assistant (Antigravity/DeepMind) for assistance with scaffolding the Next.js app, generating Tailwind UI components, drafting the data-fetching scripts, and conducting parts of the automated data analysis.
+> **AI Disclosure:** As permitted by the rules, I used an AI coding assistant Codex for assistance with scaffolding the Next.js app, generating Tailwind UI components, drafting the data-fetching scripts, and conducting parts of the automated data analysis.
 
 ## Tech Stack
 - Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4
