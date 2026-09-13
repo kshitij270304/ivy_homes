@@ -54,7 +54,7 @@ export async function getAllListings(authHeader: string) {
     const batchOffsets = Array.from({ length: 20 }, (_, i) => offset + i * 50);
     const responses = await Promise.all(
       batchOffsets.map(off => 
-        fetch(${BASE_URL}/v1/listings?limit=50&offset=, {
+        fetch(`${BASE_URL}/v1/listings?limit=50&offset=${off}`, {
           headers: { 'X-API-Key': apiKey, 'Authorization': authHeader },
           cache: 'no-store'
         }).then(r => r.ok ? r.json() : null).catch(() => null)
