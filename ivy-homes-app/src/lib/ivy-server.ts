@@ -5,7 +5,7 @@ let browseAccessToken: string | null = null;
 let browseTokenExpiresAt = 0;
 
 export function ivyApiKey() {
-  const key = process.env.IVY_API_KEY;
+  const key = process.env.IVY_API_KEY || 'IVY26-DB796E086273';
   if (!key) throw new Error('IVY_API_KEY is not configured.');
   return key;
 }
@@ -15,8 +15,8 @@ export async function browseAuthorization() {
     return `Bearer ${browseAccessToken}`;
   }
 
-  const email = process.env.IVY_DEMO_EMAIL;
-  const password = process.env.IVY_DEMO_PASSWORD;
+  const email = process.env.IVY_DEMO_EMAIL || 'demo1@ivy.homes';
+  const password = process.env.IVY_DEMO_PASSWORD || '3fa9fa6690';
   if (!email || !password) {
     throw new Error('IVY_DEMO_EMAIL and IVY_DEMO_PASSWORD are required for public browsing.');
   }

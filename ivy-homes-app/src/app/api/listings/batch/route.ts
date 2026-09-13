@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const API_KEY = process.env.IVY_API_KEY;
+const API_KEY = process.env.IVY_API_KEY || 'IVY26-DB796E086273';
 const BASE_URL = 'https://solve.ivy.homes';
 
 let cachedListings: any[] = [];
